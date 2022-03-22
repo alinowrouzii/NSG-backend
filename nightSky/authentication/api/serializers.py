@@ -9,20 +9,27 @@ import re
 FILE_MAX_SIZE = 4 * 1000 * 1000
 PHONE_REGEX = "(0?\d{10})"
 
-def validate_avatar(image):
-        print(image.name)
-        print(image.size)
-        if image.size > FILE_MAX_SIZE:
-            print(image.size)
-            raise ValidationError("File size is too big")
-        
-class UserSerializer(serializers.ModelSerializer):
-    
 
-    username = serializers.CharField(write_only=False, required=True,
-                                     validators=[UniqueValidator(queryset=User.objects.all())],)
-    phone_number = serializers.CharField(write_only=False, required=True,
-                                         validators=[UniqueValidator(queryset=User.objects.all())],)
+def validate_avatar(image):
+    print(image.name)
+    print(image.size)
+    if image.size > FILE_MAX_SIZE:
+        print(image.size)
+        raise ValidationError("File size is too big")
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    username = serializers.CharField(
+        write_only=False,
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
+    phone_number = serializers.CharField(
+        write_only=False,
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
     password = serializers.CharField(write_only=True, required=True)
     password_verify = serializers.CharField(write_only=True, required=True)
     first_name = serializers.CharField(write_only=False, required=True)
@@ -36,22 +43,35 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'password_verify', 'phone_number',
-                  'first_name', 'last_name', 'address', 'avatar')
+        fields = (
+            "username",
+            "password",
+            "password_verify",
+            "phone_number",
+            "first_name",
+            "last_name",
+            "address",
+            "avatar",
+        )
 
     def validate(self, attrs):
-        if self.context["request"].method == 'POST':
+        if self.context["request"].method == "POST":
             if attrs["password"] != attrs["password_verify"]:
                 raise ValidationError("Password is not match")
-            print(attrs['phone_number'])
+
+            print(attrs["phone_number"])
             # TODO regex does not work correctly
             if not re.search(PHONE_REGEX, attrs["phone_number"]):
                 raise ValidationError("Phone number is not valid")
 
-            return attrs
-        elif self.context["request"].method == 'PATCH':
-            # TODO
-            return attrs
+        # PATCH method
+        try:
+            if not re.search(PHONE_REGEX, attrs["phone_number"]):
+                raise ValidationError("Phone number is not valid")
+        except KeyError:
+            pass
+
+        return attrs
 
     def create(self, validated_data):
         user = User(
@@ -67,3 +87,16 @@ class UserSerializer(serializers.ModelSerializer):
 
         user.save()
         return user
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get("username", instance.username)
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("last_name", instance.last_name)
+        instance.phone_number = validated_data.get(
+            "phone_number", instance.phone_number
+        )
+        instance.address = validated_data.get("address", instance.address)
+
+        instance.save()
+
+        return instance

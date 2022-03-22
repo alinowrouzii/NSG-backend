@@ -4,3 +4,4 @@ venv
 db.sql*
 __pycache__/
 commands/
+media/
