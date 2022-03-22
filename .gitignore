@@ -1,2 +1,6 @@
 .vscode
 venv
+.env
+db.sql*
+__pycache__/
+commands/
