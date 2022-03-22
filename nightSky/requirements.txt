@@ -1,0 +1,12 @@
+asgiref==3.5.0
+backports.zoneinfo==0.2.1
+cffi==1.15.0
+cryptography==36.0.2
+Django==4.0.3
+django-rest-knox==4.2.0
+djangorestframework==3.13.1
+Pillow==9.0.1
+pycparser==2.21
+python-decouple==3.6
+pytz==2022.1
+sqlparse==0.4.2
