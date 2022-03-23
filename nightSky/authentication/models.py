@@ -1,10 +1,11 @@
+import black
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import os
 
-main_dir = 'auth'
-user_dir = 'user'
-avatar_dir = 'avatar'
+main_dir = "auth"
+user_dir = "user"
+avatar_dir = "avatar"
 
 
 def get_avatar_path(instance, filename):
@@ -13,6 +14,7 @@ def get_avatar_path(instance, filename):
 
 class User(AbstractUser):
     phone_number = models.CharField(
-        max_length=128, unique=True, blank=False, null=False)
+        max_length=128, unique=True, blank=False, null=False
+    )
     address = models.CharField(max_length=512, blank=True)
-    avatar = models.ImageField(upload_to=get_avatar_path, null=True)
+    avatar = models.ImageField(upload_to=get_avatar_path, blank=True, null=True)

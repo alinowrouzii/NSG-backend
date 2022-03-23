@@ -100,3 +100,12 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+
+class UserSerializerMinimal(serializers.ModelSerializer):
+    full_name = serializers.CharField(read_only=True, source="get_full_name")
+    
+    class Meta:
+        model = User
+        fields = ("full_name", "avatar")
