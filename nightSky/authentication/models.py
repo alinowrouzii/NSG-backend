@@ -18,3 +18,5 @@ class User(AbstractUser):
     )
     address = models.CharField(max_length=512, blank=True)
     avatar = models.ImageField(upload_to=get_avatar_path, blank=True, null=True)
+    
+    # TODO: add verified field to user

@@ -7,7 +7,7 @@ import re
 
 # 4 MB
 FILE_MAX_SIZE = 4 * 1000 * 1000
-PHONE_REGEX = "(0?\d{10})"
+PHONE_REGEX = "^09[\d]{9}$"
 
 
 def validate_avatar(image):
@@ -52,6 +52,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "address",
             "avatar",
+            "email",
         )
 
     def validate(self, attrs):
@@ -59,15 +60,15 @@ class UserSerializer(serializers.ModelSerializer):
             if attrs["password"] != attrs["password_verify"]:
                 raise ValidationError("Password is not match")
 
-            print(attrs["phone_number"])
             # TODO regex does not work correctly
             if not re.search(PHONE_REGEX, attrs["phone_number"]):
-                raise ValidationError("Phone number is not valid")
+                raise ValidationError({"phone_number": "Phone number is not valid"})
+            return attrs
 
         # PATCH method
         try:
             if not re.search(PHONE_REGEX, attrs["phone_number"]):
-                raise ValidationError("Phone number is not valid")
+                raise ValidationError({"phone_number": "Phone number is not valid"})
         except KeyError:
             pass
 
@@ -80,6 +81,7 @@ class UserSerializer(serializers.ModelSerializer):
             last_name=validated_data["last_name"],
             phone_number=validated_data["phone_number"],
             address=validated_data.get("address", ""),
+            email=validated_data.get("email", ""),
             avatar=validated_data.get("avatar", None),
         )
 
@@ -96,16 +98,16 @@ class UserSerializer(serializers.ModelSerializer):
             "phone_number", instance.phone_number
         )
         instance.address = validated_data.get("address", instance.address)
+        instance.email = validated_data.get("email", instance.email)
 
         instance.save()
 
         return instance
 
 
-
 class UserSerializerMinimal(serializers.ModelSerializer):
     full_name = serializers.CharField(read_only=True, source="get_full_name")
-    
+
     class Meta:
         model = User
         fields = ("full_name", "avatar")
