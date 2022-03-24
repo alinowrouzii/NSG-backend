@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "tinymce",
     "authentication",
     "blog",
+    "shop",
 ]
 
 MIDDLEWARE = [
@@ -135,9 +136,11 @@ REST_KNOX = {
 
 # TINYMCE_JS_URL = 'https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js'
 
+# TODO add custom font and file upload to tinymce
 TINYMCE_DEFAULT_CONFIG = {
     "height": "620px",
     "width": "960px",
+    "theme": "silver",
     "menubar": "file edit view insert format tools table help",
     "plugins": "advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code "
     "fullscreen insertdatetime media table paste code help wordcount spellchecker",
