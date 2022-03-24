@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "tinymce",
     "authentication",
     "blog",
+    "product",
     "shop",
 ]
 
