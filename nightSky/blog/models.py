@@ -29,7 +29,7 @@ class Post(models.Model):
     image = models.ImageField(upload_to=get_post_path, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.pk} | {self.title}"
+        return f"{self.pk} | {self.title[:15]}"
 
     def get_jalali_date(self):
         return jdatetime.datetime.fromgregorian(

@@ -11,7 +11,7 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("id", "get_username", "get_user_fullname", "status", "timestamp")
+    list_display = ("id", "post", "get_username", "get_user_fullname", "status", "timestamp")
     list_filter = ("timestamp", "status",)
     search_fields = ("user__username",)
     
