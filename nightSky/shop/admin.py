@@ -21,7 +21,6 @@ class OrderAdminForm(ModelForm):
             if payment.price == 0:
                 raise ValidationError("First save the order with price greater than zero. Then change status to PAYMENT and save order again.")
            
-        
         return cleaned_data
 
 

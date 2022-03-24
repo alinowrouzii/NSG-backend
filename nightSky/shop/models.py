@@ -13,8 +13,8 @@ class Order(models.Model):
         POSTING = 3, _("Posting")
         POSTED = 4, _("Posted")
     
-    product = models.OneToOneField("product.NightSkyProduct", on_delete=models.DO_NOTHING, related_name="orders")
-    user = models.ForeignKey("authentication.User", on_delete=models.DO_NOTHING, related_name="orders")
+    product = models.OneToOneField("product.NightSkyProduct", on_delete=models.CASCADE, null=True, related_name="orders")
+    user = models.ForeignKey("authentication.User", on_delete=models.SET_NULL, null=True, related_name="orders")
     status = models.IntegerField(choices=StatusChoice.choices, default=StatusChoice.PENDING)
     timestamp = models.DateTimeField(default=timezone.now, editable=False)
     
@@ -24,7 +24,7 @@ class Order(models.Model):
 class Payment(models.Model):
     price = models.PositiveIntegerField(default=0, help_text="At the payment stage, the price should be greather than zero")
     is_verified = models.BooleanField(default=False)
-    order = models.OneToOneField("shop.Order", on_delete=models.DO_NOTHING, related_name="payment")
+    order = models.OneToOneField("shop.Order", on_delete=models.CASCADE, related_name="payment")
 
 
 @receiver(pre_save, sender=Order)
@@ -36,3 +36,6 @@ def my_callback(sender, instance, *args, **kwargs):
             raise ValidationError({"order_price": "Price should be set for payment stage"})
     except Payment.DoesNotExist:
         pass        
+    print("===========")
+    print(instance._state.adding)
+    print("===========")
