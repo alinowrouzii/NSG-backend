@@ -88,16 +88,16 @@ class ProductModel(models.Model):
 
 class NightSkyProduct(models.Model):
     color = models.ForeignKey(
-        "product.Color", on_delete=models.DO_NOTHING, related_name="night_sky_products"
+        "product.Color", on_delete=models.SET_NULL, null=True, related_name="night_sky_products"
     )
     design = models.ForeignKey(
-        "product.Design", on_delete=models.DO_NOTHING, related_name="night_sky_products"
+        "product.Design", on_delete=models.SET_NULL, null=True, related_name="night_sky_products"
     )
     font = models.ForeignKey(
-        "product.Font", on_delete=models.DO_NOTHING, related_name="night_sky_products"
+        "product.Font", on_delete=models.SET_NULL, null=True, related_name="night_sky_products"
     )
     map_design = models.ForeignKey(
-        "product.MapDesign", on_delete=models.DO_NOTHING, related_name="night_sky_products"
+        "product.MapDesign", on_delete=models.SET_NULL, null=True, related_name="night_sky_products"
     )
     sentense = models.CharField(max_length=512, blank=True)
     handwriting = models.CharField(max_length=512, blank=True)
@@ -109,10 +109,10 @@ class NightSkyProduct(models.Model):
     sound_frequency = models.CharField(max_length=512, blank=True)
     is_shiny = models.BooleanField(default=False)
     model = models.ForeignKey(
-        "product.Model", on_delete=models.DO_NOTHING, related_name="night_sky_product"
+        "product.Model", on_delete=models.SET_NULL, null=True, related_name="night_sky_product"
     )
     size = models.ForeignKey(
-        "product.Size", on_delete=models.DO_NOTHING, related_name="night_sky_product"
+        "product.Size", on_delete=models.SET_NULL, null=True, related_name="night_sky_product"
     )
     frame_color = models.CharField(max_length=512, blank=True)
     
