@@ -30,36 +30,60 @@ def get_font_path(instance, filename):
 
 
 class Color(models.Model):
-    text = models.CharField(max_length=256, blank=True)
+    text = models.CharField(max_length=256, blank=False, null=False)
     image = models.ImageField(upload_to=get_color_path, blank=False, null=False)
+    
+    def __str__(self):
+        return self.text
 
 
 class Design(models.Model):
-    text = models.CharField(max_length=256, blank=True)
+    text = models.CharField(max_length=256, blank=False, null=False)
     image = models.ImageField(upload_to=get_design_path, blank=False, null=False)
+    
+    def __str__(self):
+        return self.text
 
 
 class MapDesign(models.Model):
     text = models.CharField(max_length=256, blank=True)
     image = models.ImageField(upload_to=get_map_design_path, blank=False, null=False)
+    
+    def __str__(self):
+        return self.text
 
 
 class Font(models.Model):
     text = models.CharField(max_length=256, blank=True)
     image = models.ImageField(upload_to=get_font_path, blank=False, null=False)
+    
+    def __str__(self):
+        return self.text
 
 
 class Size(models.Model):
     size = models.CharField(max_length=256, blank=False, null=False)
-
+    
+    def __str__(self):
+        return self.size
 
 class Model(models.Model):
     name = models.CharField(max_length=256, blank=False, null=False)
+    
+    def __str__(self):
+        return self.name
 
 
 class ProductModel(models.Model):
-    model = models.OneToOneField("product.Model", on_delete=models.CASCADE)
+    model = models.OneToOneField("product.Model", on_delete=models.CASCADE, related_name="product_model")
     sizes = models.ManyToManyField("product.Size")
+    
+    def __str__(self):
+        return f"{self.id} - {self.model.name}"
+
+    
+    
+    
 
 
 class NightSkyProduct(models.Model):
@@ -79,7 +103,7 @@ class NightSkyProduct(models.Model):
     handwriting = models.CharField(max_length=512, blank=True)
     location = models.CharField(max_length=512, blank=True)
 
-    date = models.DateTimeField(blank=True)
+    date = models.DateTimeField(blank=True, null=True)
     qr_code = models.CharField(max_length=512, blank=True)
     map = models.CharField(max_length=512, blank=True)
     sound_frequency = models.CharField(max_length=512, blank=True)
@@ -90,12 +114,18 @@ class NightSkyProduct(models.Model):
     size = models.ForeignKey(
         "product.Size", on_delete=models.DO_NOTHING, related_name="night_sky_product"
     )
-    # size = models.In
+    frame_color = models.CharField(max_length=512, blank=True)
+    
+    def __str__(self):
+        return f"product {self.id}"
 
 
 @receiver(pre_save, sender=NightSkyProduct)
 def my_callback(sender, instance, *args, **kwargs):
     # Reverse relation from model to OneToOne field
-    model = instance.model.model
-    if not instance.size in model.sizes.all():
-        return ValidationError({"model_size": "size does not exist for selected model"})
+    try:
+        model = instance.model.product_model
+        if not instance.size in model.sizes.all():
+            raise ValidationError({"model_size": "size does not exist for selected model"})
+    except ProductModel.DoesNotExist:
+        raise ValidationError({"model_size": "Product model does not exist"})
