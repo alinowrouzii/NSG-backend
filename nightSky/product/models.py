@@ -32,7 +32,7 @@ def get_font_path(instance, filename):
 class Color(models.Model):
     text = models.CharField(max_length=256, blank=False, null=False)
     image = models.ImageField(upload_to=get_color_path, blank=False, null=False)
-    
+
     def __str__(self):
         return self.text
 
@@ -40,7 +40,7 @@ class Color(models.Model):
 class Design(models.Model):
     text = models.CharField(max_length=256, blank=False, null=False)
     image = models.ImageField(upload_to=get_design_path, blank=False, null=False)
-    
+
     def __str__(self):
         return self.text
 
@@ -48,7 +48,7 @@ class Design(models.Model):
 class MapDesign(models.Model):
     text = models.CharField(max_length=256, blank=True)
     image = models.ImageField(upload_to=get_map_design_path, blank=False, null=False)
-    
+
     def __str__(self):
         return self.text
 
@@ -56,48 +56,62 @@ class MapDesign(models.Model):
 class Font(models.Model):
     text = models.CharField(max_length=256, blank=True)
     image = models.ImageField(upload_to=get_font_path, blank=False, null=False)
-    
+
     def __str__(self):
         return self.text
 
 
 class Size(models.Model):
     size = models.CharField(max_length=256, blank=False, null=False)
-    
+
     def __str__(self):
         return self.size
 
+
 class Model(models.Model):
     name = models.CharField(max_length=256, blank=False, null=False)
-    
+
     def __str__(self):
         return self.name
 
 
 class ProductModel(models.Model):
-    model = models.OneToOneField("product.Model", on_delete=models.CASCADE, related_name="product_model")
+    model = models.OneToOneField(
+        "product.Model",
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name="product_model",
+    )
     sizes = models.ManyToManyField("product.Size")
-    
-    def __str__(self):
-        return f"{self.id} - {self.model.name}"
 
-    
-    
-    
+    def __str__(self):
+        return f"{self.model.id} - {self.model.name}"
 
 
 class NightSkyProduct(models.Model):
     color = models.ForeignKey(
-        "product.Color", on_delete=models.SET_NULL, null=True, related_name="night_sky_products"
+        "product.Color",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="night_sky_products",
     )
     design = models.ForeignKey(
-        "product.Design", on_delete=models.SET_NULL, null=True, related_name="night_sky_products"
+        "product.Design",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="night_sky_products",
     )
     font = models.ForeignKey(
-        "product.Font", on_delete=models.SET_NULL, null=True, related_name="night_sky_products"
+        "product.Font",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="night_sky_products",
     )
     map_design = models.ForeignKey(
-        "product.MapDesign", on_delete=models.SET_NULL, null=True, related_name="night_sky_products"
+        "product.MapDesign",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="night_sky_products",
     )
     sentense = models.CharField(max_length=512, blank=True)
     handwriting = models.CharField(max_length=512, blank=True)
@@ -109,13 +123,19 @@ class NightSkyProduct(models.Model):
     sound_frequency = models.CharField(max_length=512, blank=True)
     is_shiny = models.BooleanField(default=False)
     model = models.ForeignKey(
-        "product.Model", on_delete=models.SET_NULL, null=True, related_name="night_sky_product"
+        "product.Model",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="night_sky_product",
     )
     size = models.ForeignKey(
-        "product.Size", on_delete=models.SET_NULL, null=True, related_name="night_sky_product"
+        "product.Size",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="night_sky_product",
     )
     frame_color = models.CharField(max_length=512, blank=True)
-    
+
     def __str__(self):
         return f"product {self.id}"
 
@@ -126,6 +146,8 @@ def my_callback(sender, instance, *args, **kwargs):
     try:
         model = instance.model.product_model
         if not instance.size in model.sizes.all():
-            raise ValidationError({"model_size": "size does not exist for selected model"})
+            raise ValidationError(
+                {"model_size": "size does not exist for selected model"}
+            )
     except ProductModel.DoesNotExist:
         raise ValidationError({"model_size": "Product model does not exist"})

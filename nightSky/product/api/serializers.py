@@ -1,5 +1,14 @@
 from rest_framework import serializers
-from product.models import Color, Font, Design, MapDesign, Size, Model, NightSkyProduct
+from product.models import (
+    Color,
+    Font,
+    Design,
+    MapDesign,
+    ProductModel,
+    Size,
+    Model,
+    NightSkyProduct,
+)
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -38,6 +47,14 @@ class ModelSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ProductModelSerializer(serializers.ModelSerializer):
+    model = ModelSerializer(read_only=True)
+    sizes = SizeSerializer(read_only=True, many=True)
+    class Meta:
+        model = ProductModel
+        fields = ("model", "sizes")
+
+
 class NightSkyProductSerializer(serializers.ModelSerializer):
     color = serializers.PrimaryKeyRelatedField(
         queryset=Color.objects.all(),
@@ -73,15 +90,15 @@ class NightSkyProductSerializer(serializers.ModelSerializer):
         write_only=False,
         required=True,
     )
-    
+
     def to_representation(self, obj):
-        self.fields['color'] = ColorSerializer()
-        self.fields['font'] = FontSerializer()
-        self.fields['design'] = DesignSerializer()
-        self.fields['map_design'] = MapDesignSerializer()
-        self.fields['size'] = SizeSerializer()
-        self.fields['model'] = ModelSerializer()
-        
+        self.fields["color"] = ColorSerializer()
+        self.fields["font"] = FontSerializer()
+        self.fields["design"] = DesignSerializer()
+        self.fields["map_design"] = MapDesignSerializer()
+        self.fields["size"] = SizeSerializer()
+        self.fields["model"] = ModelSerializer()
+
         return super(NightSkyProductSerializer, self).to_representation(obj)
 
     class Meta:

@@ -46,7 +46,12 @@ class SizeAdmin(admin.ModelAdmin):
 
 @admin.register(ProductModel)
 class ProductModelAdmin(admin.ModelAdmin):
-    list_display = ("id", "get_model_name")
+    list_display = ("get_id", "get_model_name")
+
+    
+    @admin.display(description="id")
+    def get_id(self, obj):
+        return obj.model.id
 
     @admin.display(description="model name")
     def get_model_name(self, obj):
