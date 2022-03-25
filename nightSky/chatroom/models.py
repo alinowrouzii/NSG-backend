@@ -1,5 +1,9 @@
 from django.db import models
 from django.utils import timezone
+from rest_framework.exceptions import ValidationError
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from shop.models import Order
 import os
 
 main_dir = "chatroom"
@@ -33,3 +37,13 @@ class Message(models.Model):
     text = models.CharField(max_length=1024, blank=False, null=False)
     photo = models.ImageField(upload_to=get_message_path, blank=True, null=True)
     timestamp = models.DateTimeField(default=timezone.now, editable=False)
+
+
+
+@receiver(pre_save, sender=Message)
+def my_callback(sender, instance, *args, **kwargs):
+    
+    try:
+        Order.objects.get(user=instance.user, pk=instance.order.pk)
+    except Order.DoesNotExist:
+        raise ValidationError({"order": "order does not exist"})
