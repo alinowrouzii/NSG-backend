@@ -18,6 +18,10 @@ class Order(models.Model):
     status = models.IntegerField(choices=StatusChoice.choices, default=StatusChoice.PENDING)
     timestamp = models.DateTimeField(default=timezone.now, editable=False)
     
+    def __str__(self):
+        pass
+        return f"{self.id} | {self.user.username}"
+    
     
     
     

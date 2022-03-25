@@ -23,4 +23,5 @@ urlpatterns = [
     path('api/v1/blog/', include('blog.api.urls')),
     path('api/v1/product/', include('product.api.urls')),
     path('api/v1/shop/', include('shop.api.urls')),
+    path('api/v1/chatroom/', include('chatroom.api.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
