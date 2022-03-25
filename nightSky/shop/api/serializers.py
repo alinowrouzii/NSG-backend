@@ -3,7 +3,7 @@ from shop.models import Order, Payment
 from product.models import NightSkyProduct
 from product.api.serializers import NightSkyProductSerializer
 
-class OrderWriteSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.ModelSerializer):
 
     product = NightSkyProductSerializer(write_only=False, required=True)
 
@@ -22,7 +22,6 @@ class OrderWriteSerializer(serializers.ModelSerializer):
         product = NightSkyProduct.objects.create(**product_data)
 
         order = Order(
-            # product=validated_data["product"],
             product=product,
             user=user,
         )
@@ -33,6 +32,3 @@ class OrderWriteSerializer(serializers.ModelSerializer):
 
         return order
 
-
-class OrderReadSerializer(serializers.ModelSerializer):
-    pass
