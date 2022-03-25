@@ -34,7 +34,6 @@ class MessageAPIView(
         
         if self.is_admin():
             user = request.data["user"]
-            print("heyyyyyyyyyyyyyy", user)
             # If admin wants to send message to user, user_is_sender should be False
             user_is_sender = False
         else:
@@ -48,5 +47,4 @@ class MessageAPIView(
         
     def post(self, request, *args, **kwargs):
         self.set_request_context()
-        print(request.data["user"])
         return super().create(request, *args, **kwargs)

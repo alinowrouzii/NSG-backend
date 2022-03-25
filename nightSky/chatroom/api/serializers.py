@@ -18,8 +18,6 @@ class MessageSerializer(serializers.ModelSerializer):
         required=True,
     )
     
-    photo = serializers.ImageField(write_only=False, required=False)
-
     class Meta:
         model = Message
         fields = (
@@ -32,7 +30,7 @@ class MessageSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {
             "text": {"write_only": False, "required": True},
-            # "photo": {"write_only": False, "required": False},
+            "photo": {"write_only": False, "required": False},
             "user_is_sender": {"write_only": False, "required": True},
         }
 
