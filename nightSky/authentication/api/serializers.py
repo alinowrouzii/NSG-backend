@@ -58,7 +58,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if self.context["request"].method == "POST":
             if attrs["password"] != attrs["password_verify"]:
-                raise ValidationError("Password is not match")
+                raise ValidationError({"password": "Password is not match"})
 
             # TODO regex does not work correctly
             if not re.search(PHONE_REGEX, attrs["phone_number"]):
@@ -99,6 +99,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
         instance.address = validated_data.get("address", instance.address)
         instance.email = validated_data.get("email", instance.email)
+        instance.avatar = validated_data.get("avatar", instance.avatar)
 
         instance.save()
 
