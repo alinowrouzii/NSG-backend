@@ -22,3 +22,8 @@ class OrderAPIView(
         # return Order.objects.all()
 
 
+class RequestPaymentAPIView():
+    pass
+
+class VerifyPaymentAPIView():
+    pass
