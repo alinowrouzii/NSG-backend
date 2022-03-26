@@ -7,7 +7,7 @@ from product.api.serializers import NightSkyProductSerializer
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = ("price", "is_verified")
+        fields = ("price", "is_verified", "ref_id")
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -17,7 +17,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ("id", "product", "payment")
+        fields = ("id", "product", "payment", "status", "timestamp")
 
     def validate(self, attrs):
         # Just for now ;)

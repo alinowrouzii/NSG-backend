@@ -29,6 +29,10 @@ class Payment(models.Model):
     price = models.PositiveIntegerField(default=0, help_text="At the payment stage, the price should be greather than zero")
     is_verified = models.BooleanField(default=False)
     order = models.OneToOneField("shop.Order", on_delete=models.CASCADE, related_name="payment")
+    
+    authority = models.CharField(max_length=512, blank=True)
+    ref_id = models.CharField(max_length=512, blank=True)
+    
 
 
 @receiver(pre_save, sender=Order)
@@ -40,6 +44,3 @@ def my_callback(sender, instance, *args, **kwargs):
             raise ValidationError({"order_price": "Price should be set for payment stage"})
     except Payment.DoesNotExist:
         pass        
-    print("===========")
-    print(instance._state.adding)
-    print("===========")
