@@ -104,6 +104,7 @@ class NightSkyProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = NightSkyProduct
         fields = (
+            "id",
             "color",
             "font",
             "design",

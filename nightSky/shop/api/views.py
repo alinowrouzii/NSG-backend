@@ -7,12 +7,9 @@ from rest_framework import status
 from knox.auth import TokenAuthentication
 from shop.models import Order, Payment
 from shop.api.serializers import OrderSerializer
-from django.shortcuts import redirect
 from rest_framework.response import Response
 import requests
 import json
-from time import sleep
-from zeep.client import Client
 
 from nightSky.settings import (
     MERCHANT_ID,
@@ -20,11 +17,6 @@ from nightSky.settings import (
     ZP_API_REQUEST,
     ZP_API_STARTPAY,
     ZP_API_VERIFY,
-)
-
-
-ZARINPAL_WEBSERVICE = (
-    "https://www.sandbox.zarinpal.com/pg/services/WebGate/wsdl"  # Required
 )
 
 
