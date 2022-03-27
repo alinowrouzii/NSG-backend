@@ -64,3 +64,6 @@ class PaymentAdmin(admin.ModelAdmin):
     @admin.display(description="fullname")
     def get_user_fullname(self, obj):
         return obj.order.user.get_full_name()
+    
+    def has_add_permission(self, request):
+        return False

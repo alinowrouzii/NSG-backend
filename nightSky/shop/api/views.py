@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import mixins
@@ -98,9 +99,8 @@ class VerifyPaymentAPIView(generics.GenericAPIView):
     def get_queryset(self):
         return Order.objects.all()
 
-    # def get_order(self, authority)
     def get_payment(self, authority):
-        return Payment.objects.get(authority=authority)
+        return Payment.objects.get(authority=authority, is_verified=False)
 
     def get(self, request):
         t_status = request.GET.get("Status")
@@ -134,6 +134,8 @@ class VerifyPaymentAPIView(generics.GenericAPIView):
                         data=self.get_serializer(payment.order).data,
                         status=status.HTTP_200_OK,
                     )
+                    # TODO: redirect to panel
+                    return redirect()
                 elif t_status == 101:
                     return Response(
                         "Transaction submitted : " + str(req.json()["data"]["message"])
