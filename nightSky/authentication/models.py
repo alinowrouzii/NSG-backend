@@ -13,6 +13,7 @@ def get_avatar_path(instance, filename):
 
 
 class User(AbstractUser):
+    is_verified = models.BooleanField(default=False)
     phone_number = models.CharField(
         max_length=128, unique=True, blank=False, null=False
     )

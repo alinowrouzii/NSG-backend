@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import mixins
 from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.exceptions import ValidationError
 from knox.views import LoginView as KnoxLoginView
 from knox.auth import TokenAuthentication
 from authentication.api.serializers import UserSerializer
@@ -17,6 +18,9 @@ class LoginAPIView(KnoxLoginView):
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
+        if not user.is_verified:
+            raise ValidationError({"user": "user is not verified"})
+
         login(request, user)
         return super(LoginAPIView, self).post(request, format=None)
 
