@@ -16,16 +16,10 @@ class CommentSerializer(serializers.ModelSerializer):
         
         
     def create(self , validated_data):
-        user = self.context["request"].user
+        validated_data["user"] = self.context["request"].user
         
-        comment = Comment(
-            text = validated_data["text"],
-            post = validated_data["post"],
-            user = user,
-        )
-        
-        comment.save()
-        
+        comment = Comment.objects.create(**validated_data)
+            
         return comment
 
 
