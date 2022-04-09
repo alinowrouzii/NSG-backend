@@ -7,8 +7,8 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.exceptions import ValidationError
 from knox.views import LoginView as KnoxLoginView
 from knox.auth import TokenAuthentication
-from authentication.api.serializers import UserSerializer
-from authentication.models import User
+from authentication.api.serializers import UserSerializer, ForgetPasswordVerifySerializer
+from authentication.models import ForgetRecord
 
 
 class LoginAPIView(KnoxLoginView):
@@ -55,3 +55,24 @@ class UserAPIView(
 
     def patch(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
+
+
+
+class ForgetPasswordVerifyAPIView(
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet
+):
+    permission_classes = (AllowAny,)
+    serializer_class = ForgetPasswordVerifySerializer
+    
+    def get_object(self):
+        username = self.request.data.get('username', None)
+        code = self.request.data.get('code', None)
+        try:
+            return ForgetRecord.objects.get(user__username=username, code=code, expired=False, is_used=False)
+        except ForgetRecord.DoesNotExist:
+            raise ValidationError({'detail': 'data is not valid'})
+
+    
+    def patch(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)

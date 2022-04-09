@@ -2,6 +2,7 @@ from rest_framework import serializers
 from authentication.models import User
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
+from authentication.models import ForgetRecord
 
 import re
 
@@ -112,3 +113,47 @@ class UserSerializerMinimal(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("full_name", "avatar")
+
+
+class ForgetPasswordRequestSerializer(serializers.ModelSerializer):
+            
+    username = serializers.CharField(required=True, write_only=False)
+    
+    class Meta:
+        model = ForgetRecord
+        fields = ("username", "code", "expiration_date")
+        
+    def validate(self, attrs):
+        return super().validate(attrs)
+    
+    def create(self, validated_data):
+        return ForgetRecord.objects.create(**validated_data)
+    
+    
+    def update(self, instance, validated_data):
+        print(validated_data)
+        print('im here')
+        
+        return instance
+        
+        
+        
+class ForgetPasswordVerifySerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    code = serializers.CharField(required=True, write_only=True)
+    new_password = serializers.CharField(required=True, write_only=True)
+    
+    class Meta:
+        model = ForgetRecord
+        fields = ("code", "user", "new_password")
+        
+    def validate(self, attrs):
+        return super().validate(attrs)
+    
+    def update(self, instance, validated_data):
+        user = instance.user
+        user.set_password(validated_data['new_password'])
+        user.save()
+        
+        return instance
+        
