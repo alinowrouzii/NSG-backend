@@ -7,8 +7,12 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.exceptions import ValidationError
 from knox.views import LoginView as KnoxLoginView
 from knox.auth import TokenAuthentication
-from authentication.api.serializers import UserSerializer, ForgetPasswordVerifySerializer
-from authentication.models import ForgetRecord
+from authentication.api.serializers import (
+    UserSerializer,
+    ForgetPasswordVerifySerializer,
+    ForgetPasswordRequestSerializer,
+)
+from authentication.models import ForgetRecord, User
 
 
 class LoginAPIView(KnoxLoginView):
@@ -57,22 +61,47 @@ class UserAPIView(
         return super().partial_update(request, *args, **kwargs)
 
 
-
-class ForgetPasswordVerifyAPIView(
-    mixins.UpdateModelMixin,
-    viewsets.GenericViewSet
-):
+class ForgetPasswordVerifyAPIView(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     permission_classes = (AllowAny,)
     serializer_class = ForgetPasswordVerifySerializer
-    
-    def get_object(self):
-        username = self.request.data.get('username', None)
-        code = self.request.data.get('code', None)
-        try:
-            return ForgetRecord.objects.get(user__username=username, code=code, expired=False, is_used=False)
-        except ForgetRecord.DoesNotExist:
-            raise ValidationError({'detail': 'data is not valid'})
 
-    
+    def get_object(self):
+        username = self.request.data.get("username", None)
+        code = self.request.data.get("code", None)
+        try:
+            return ForgetRecord.objects.get(
+                user__username=username, code=code, expired=False, is_used=False
+            )
+        except ForgetRecord.DoesNotExist:
+            raise ValidationError({"detail": "data is not valid"})
+
     def patch(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
+
+
+class ForgetPasswordRequestAPIView(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    permission_classes = (AllowAny,)
+    serializer_class = ForgetPasswordRequestSerializer
+
+    def get_user_pk(self):
+        try:
+            username = self.request.data["username"]
+            return User.objects.get(username=username).pk
+        except User.DoesNotExist:
+            raise ValidationError({"detail": "user not found"})
+        except KeyError:
+            raise ValidationError({"username": "this field is required"})
+
+    def set_request_context(self):
+        request = self.request
+
+        user = self.get_user_pk()
+
+        mutable = request.data._mutable
+        request.data._mutable = True
+        request.data["user"] = user
+        request.data._mutable = mutable
+
+    def post(self, request, *args, **kwargs):
+        self.set_request_context()
+        return super().create(request, *args, **kwargs)
