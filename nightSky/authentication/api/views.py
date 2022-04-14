@@ -11,6 +11,7 @@ from authentication.api.serializers import (
     UserSerializer,
     ForgetPasswordVerifySerializer,
     ForgetPasswordRequestSerializer,
+    VerificationCodeRecordSerializer,
 )
 from authentication.models import ForgetRecord, User
 
@@ -38,7 +39,15 @@ class RegisterAPIView(
 
     def create(self, request, *args, **kwargs):
         # TODO: maybe captcha should be added to this section
-        return super().create(request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
+        
+        user = response.data["id"]
+        data = {"user": user}
+        serializer = VerificationCodeRecordSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return response
 
 
 class UserAPIView(

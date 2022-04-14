@@ -1,8 +1,9 @@
 from rest_framework import serializers
-from authentication.models import User
+from authentication.models import User, VerificationCodeRecord
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 from authentication.models import ForgetRecord
+from authentication.services.EmailServices import send_verification_code
 from django.db import transaction
 
 import re
@@ -55,6 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
             "address",
             "avatar",
             "email",
+            "id",
         )
 
     def validate(self, attrs):
@@ -156,4 +158,32 @@ class ForgetPasswordVerifySerializer(serializers.ModelSerializer):
             instance.is_used = True
             instance.save()
 
+        return instance
+
+
+
+class VerificationCodeRecordSerializer(serializers.ModelSerializer):
+    
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True,
+        required=True
+    )
+    
+    class Meta:
+        model = VerificationCodeRecord
+        fields = ("user",)
+        
+    def validated_data(self):
+        return super().validated_data
+    
+    def create(self, validated_data):
+        verification_record = VerificationCodeRecord.objects.create(user=validated_data["user"])
+        # send_verification_code(verification_record.user)    
+        return verification_record
+    
+    def update(self, instance, validated_data):
+        user = instance.user
+        user.is_verified=True
+        user.save()
         return instance
