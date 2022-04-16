@@ -79,20 +79,26 @@ class UserSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        user = User(
-            username=validated_data["username"],
-            first_name=validated_data["first_name"],
-            last_name=validated_data["last_name"],
-            phone_number=validated_data["phone_number"],
-            address=validated_data.get("address", ""),
-            email=validated_data.get("email", ""),
-            avatar=validated_data.get("avatar", None),
-        )
+        with transaction.atomic():
+            user = User(
+                username=validated_data["username"],
+                first_name=validated_data["first_name"],
+                last_name=validated_data["last_name"],
+                phone_number=validated_data["phone_number"],
+                address=validated_data.get("address", ""),
+                email=validated_data.get("email", ""),
+                avatar=validated_data.get("avatar", None),
+            )
 
-        user.set_password(validated_data["password"])
+            user.set_password(validated_data["password"])
+            user.save()
+            
+            
+            # create verification record here
+            verification_record = VerificationCodeRecord.objects.create(user=user)
+            send_verification_code(verification_record=verification_record)    
 
-        user.save()
-        return user
+            return user
 
     def update(self, instance, validated_data):
         instance.username = validated_data.get("username", instance.username)
@@ -109,7 +115,34 @@ class UserSerializer(serializers.ModelSerializer):
 
         return instance
 
-
+class UserVerifySerializer(serializers.ModelSerializer):
+    code = serializers.CharField(required=True, write_only=True)
+    
+    class Meta:
+        model = User
+        fields = ("code", "username")
+        extra_kwargs = {
+            "username": {
+                "read_only": True
+            }
+        }
+        
+    def update(self, instance, validated_data):
+        code = validated_data["code"]
+        
+        try:
+            verification_record = VerificationCodeRecord.objects.get(is_used=False, code=code)
+            verification_record.is_used = True
+            verification_record.save()
+            
+            user = verification_record.user
+            user.is_verified = True
+            user.save()
+            
+            return user
+        except VerificationCodeRecord.DoesNotExist:
+            raise ValidationError({"detail": "code is not valid"})
+    
 class UserSerializerMinimal(serializers.ModelSerializer):
     full_name = serializers.CharField(read_only=True, source="get_full_name")
 

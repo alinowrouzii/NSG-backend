@@ -11,9 +11,9 @@ from authentication.api.serializers import (
     UserSerializer,
     ForgetPasswordVerifySerializer,
     ForgetPasswordRequestSerializer,
-    VerificationCodeRecordSerializer,
+    UserVerifySerializer,
 )
-from authentication.models import ForgetRecord, User
+from authentication.models import ForgetRecord, User, VerificationCodeRecord
 
 
 class LoginAPIView(KnoxLoginView):
@@ -39,16 +39,23 @@ class RegisterAPIView(
 
     def create(self, request, *args, **kwargs):
         # TODO: maybe captcha should be added to this section
-        response = super().create(request, *args, **kwargs)
-        
-        user = response.data["id"]
-        data = {"user": user}
-        serializer = VerificationCodeRecordSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        return super().create(request, *args, **kwargs)
 
-        return response
 
+class VerifyUserAPIView(
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    permission_classes = (AllowAny,)
+    serializer_class = UserVerifySerializer
+    
+    def get_object(self):
+        return VerificationCodeRecord.objects.all()
+    
+    def patch(self, request, *args, **kwargs):
+        return super().update(request, args, kwargs)
+    
+    
 
 class UserAPIView(
     mixins.RetrieveModelMixin,
